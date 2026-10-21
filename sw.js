@@ -1,7 +1,7 @@
 /* Офлайн-кэш приложения. VERSION и список img/ пересобирает notes-app/scripts/sync_app.py.
    Записи лекций — в отдельном кэше konspekty-audio (его заполняет app.js по кнопке «Обновить базу»),
    он переживает смену версий. version.json — всегда из сети: по нему приложение узнаёт об обновлении. */
-const VERSION = "konspekty-20261022-0027";
+const VERSION = "konspekty-20261022-0044";
 const FILES = [
   "./", "index.html", "tokens.css", "app.css", "app.js", "library.js",
   "manifest.webmanifest", "icon-180.png", "icon-192.png", "icon-512.png",

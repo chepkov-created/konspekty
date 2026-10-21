@@ -1018,15 +1018,23 @@
     if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
     await remoteInfo();
     const st = await audioStatus(), cache = await caches.open(AUDIO_CACHE);
-    let i = 0;
+    let i = 0; const failed = [];
     for (const a of st.missing) {
       onProgress(`Скачиваю запись ${a.code} (${++i} из ${st.missing.length})…`);
-      const r = await fetch(audioUrl(a.code), { cache: "no-store" });
-      if (!r.ok) throw new Error(a.code);
-      const blob = await r.blob();
-      await cache.put(audioUrl(a.code), new Response(blob, { headers: { "Content-Type": "audio/mp4", "x-size": String(blob.size) } }));
-      delete blobUrls[a.code];
+      let ok = false;
+      for (let attempt = 1; attempt <= 3 && !ok; attempt++) {   // большие файлы: сеть может оборваться — повторить
+        try {
+          const r = await fetch(audioUrl(a.code), { cache: "no-store" });
+          if (!r.ok) throw new Error(String(r.status));
+          const blob = await r.blob();
+          if (a.size && blob.size !== a.size) throw new Error("неполный файл");
+          await cache.put(audioUrl(a.code), new Response(blob, { headers: { "Content-Type": "audio/mp4", "x-size": String(blob.size) } }));
+          delete blobUrls[a.code]; ok = true;
+        } catch (e) { if (attempt < 3) { onProgress(`Повтор ${a.code}…`); await new Promise(res => setTimeout(res, 2000 * attempt)); } }
+      }
+      if (!ok) failed.push(a.code);
     }
+    if (failed.length) throw new Error("не скачались записи " + failed.join(", ") + " — нажми ещё раз");
   }
   // «Обновить базу»: новые записи → новая версия приложения (service worker) → перезагрузка.
   async function updateBase(btn) {
