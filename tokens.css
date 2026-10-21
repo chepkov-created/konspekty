@@ -1,0 +1,124 @@
+/* Дизайн-токены конспектов. Единственный источник цветов, шрифтов, размеров.
+   Стиль — «кинематографичная презентация»: глубокий чёрный, тёплое свечение, стекло, тонкая сетка,
+   крупная антиква, моноширинные метки в скобках. Тема одна — тёмная (как у презентаций-референсов). */
+
+:root {
+  color-scheme: dark;
+
+  /* Нейтральная шкала — ночь и слоновая кость */
+  --paper:      oklch(13%  0.006 60);    /* фон сцены */
+  --surface:    oklch(18%  0.008 60 / .72);  /* стекло карточек */
+  --surface-solid: oklch(18% 0.008 60);
+  --surface-2:  oklch(24%  0.010 60 / .8);
+  --line:       oklch(100% 0 0 / .11);   /* тонкие линии сетки и рамок */
+  --line-2:     oklch(100% 0 0 / .22);
+  --ink-3:      oklch(66%  0.012 70);    /* метки, служебное */
+  --ink-2:      oklch(80%  0.012 70);    /* второстепенный текст */
+  --ink:        oklch(95%  0.010 80);    /* основной текст — слоновая кость */
+
+  /* Акцент сцены — тлеющий оранжевый: свечение, главное действие, одно выделенное слово */
+  --accent:     oklch(72%  0.17 52);
+  --accent-ink: oklch(16%  0.02 52);
+  --glow:       oklch(68%  0.19 48 / .42);
+
+  /* Три смысловых оттенка — больше насыщенных цветов в системе нет */
+  --person:     oklch(80% 0.10 280);     /* философы, учёные — лаванда-индиго */
+  --person-bg:  oklch(80% 0.10 280 / .14);
+  --concept:    oklch(82% 0.10 190);     /* понятия — бирюза */
+  --concept-bg: oklch(82% 0.10 190 / .10);
+  --conflict:   oklch(70% 0.18 25);      /* противоречие, спор — киноварь */
+  --conflict-bg:oklch(70% 0.18 25 / .12);
+
+  /* Приглушённые функциональные */
+  --date:       oklch(84% 0.07 80);      /* даты — латунь */
+  --date-bg:    oklch(84% 0.07 80 / .10);
+  --unclear:    oklch(82% 0.13 85);      /* неясное место — янтарь, только пунктир */
+  --focus:      var(--accent);
+
+  /* Типографика */
+  --font-display: "Didot", "Bodoni 72", "Bodoni MT", "Playfair Display", Cambria, "Times New Roman", serif;  /* заголовки-афиши */
+  --font-text:  "Iowan Old Style", "Charter", "Literata", "PT Serif", Georgia, serif;              /* чтение */
+  --font-ui:    "SF Pro Display", -apple-system, "Segoe UI Variable Display", "Segoe UI", "Inter", system-ui, sans-serif;
+  --font-mono:  "SF Mono", "JetBrains Mono", "Cascadia Mono", ui-monospace, monospace;               /* даты, метки в скобках */
+  --text-size:  1.0625rem;   /* 17 px — минимум для чтения на телефоне */
+  --text-lh:    1.62;
+  --measure:    38em;
+  --stage:      76rem;       /* ширина «слайда» */
+  --hero:  clamp(2.6rem, 9vw, 6.4rem);
+  --h1:    clamp(2rem, 6vw, 3.6rem);
+  --h2:    clamp(1.5rem, 4vw, 2.4rem);
+  --h3:    1.2rem;
+  --small: 0.8125rem; --micro: 0.6875rem;
+
+  /* Ритм и формы */
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px; --s8: 72px; --s9: 112px;
+  --r-pill: 999px;
+  --r-card: 18px;
+  --r-chip: 3px;
+  --tap: 44px;
+  --blur: 14px;
+  --shadow-card: 0 1px 0 oklch(100% 0 0 / .06) inset, 0 18px 50px oklch(0% 0 0 / .55);
+
+  /* Движение */
+  --t-fast: 160ms; --t-base: 260ms; --t-slow: 600ms; --t-reveal: 900ms;
+  --ease: cubic-bezier(.2, .7, .2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --t-fast: 0ms; --t-base: 0ms; --t-slow: 0ms; --t-reveal: 0ms; }
+}
+
+/* ---- Семантические элементы текста: одинаковы на любом экране ---- */
+.e-person {               /* философ: пилюля + инициалы */
+  display: inline-flex; align-items: center; gap: .3em;
+  padding: .05em .6em .05em .2em; border-radius: var(--r-pill);
+  background: var(--person-bg); color: var(--person); border: 1px solid oklch(80% 0.10 280 / .28);
+  font-family: var(--font-ui); font-size: .9em; font-weight: 600;
+  text-decoration: none; white-space: nowrap;
+}
+.e-person .ini {
+  display: inline-grid; place-items: center; width: 1.45em; height: 1.45em;
+  border-radius: 50%; background: var(--person); color: var(--paper);
+  font-size: .66em; font-weight: 800; letter-spacing: .02em;
+}
+.e-character {            /* персонаж: контурная пилюля, курсив, звёздочка */
+  display: inline-flex; align-items: center; gap: .25em;
+  padding: 0 .6em; border-radius: var(--r-pill); border: 1px solid var(--person);
+  background: none; color: var(--person); font-family: var(--font-ui); font-size: .9em;
+  font-style: italic; font-weight: 600; text-decoration: none; white-space: nowrap;
+}
+.e-character::before { content: "✦"; font-style: normal; font-size: .75em; }
+.e-concept {              /* понятие: точечное подчёркивание + ромб */
+  color: var(--concept); font-weight: 600; text-decoration: underline dotted;
+  text-underline-offset: .24em; text-decoration-thickness: 1.5px;
+}
+.e-concept::before { content: "◆"; font-size: .55em; margin-right: .3em; vertical-align: .25em; }
+.e-problem {              /* проблема: подчёркивание киноварью + двойная стрелка */
+  color: var(--conflict); font-weight: 600; text-decoration: underline;
+  text-underline-offset: .24em; text-decoration-thickness: 1px;
+}
+.e-problem::after { content: " ⇄"; font-size: .8em; }
+.e-date {                 /* дата: моноширинная плашка с прямыми углами */
+  font-family: var(--font-mono); font-size: .8em; color: var(--date);
+  background: var(--date-bg); border: 1px solid oklch(84% 0.07 80 / .22);
+  padding: .06em .45em; border-radius: var(--r-chip); white-space: nowrap;
+}
+.e-work { font-style: italic; color: var(--ink-2); }
+.e-work::before { content: "📖\FE0E "; font-style: normal; font-size: .8em; opacity: .7; }
+.e-quote { font-family: var(--font-text); font-style: italic; color: var(--ink); }
+.e-quote::before { content: "«"; color: var(--accent); } .e-quote::after { content: "»"; color: var(--accent); }
+.e-unclear { border: 1.5px dashed var(--unclear); border-radius: var(--r-chip); padding: 0 .3em; color: var(--ink-2); }
+.e-prov {                 /* происхождение: тише всего на странице */
+  font-family: var(--font-mono); font-size: var(--micro); color: var(--ink-3);
+  border: 1px solid var(--line); border-radius: var(--r-pill);
+  padding: 0 .5em; margin-left: .25em; vertical-align: .15em; white-space: nowrap;
+}
+.e-prov.has-audio::before { content: "▶ "; font-size: .85em; color: var(--accent); }
+
+/* ---- Конспектный язык: связки, места, числа, иноязычные слова ---- */
+.op { font-family: var(--font-ui); font-weight: 700; font-style: normal; color: var(--accent); padding: 0 .18em; white-space: nowrap; cursor: help; }
+.op.neg { color: var(--conflict); }
+.e-place { font-family: var(--font-ui); font-size: .94em; color: var(--ink); white-space: nowrap; }
+.e-place::before { content: "⌖"; color: var(--ink-3); margin-right: .15em; font-size: .9em; }
+.e-num { font-family: var(--font-mono); font-weight: 700; font-size: .9em; color: var(--ink); white-space: nowrap; }
+.e-word { font-family: var(--font-text); font-style: italic; color: var(--ink); background: var(--surface-2); border-radius: var(--r-chip); padding: 0 .3em; }
