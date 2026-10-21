@@ -9985,3 +9985,4 @@ window.LIBRARY = {
   }
  }
 };
+window.LIBRARY.version = "konspekty-20261022-012335";

@@ -1051,11 +1051,22 @@
         if (nw) {
           say("Загружаю новую версию…");
           await new Promise(res => { if (nw.state === "activated") res(); nw.addEventListener("statechange", () => nw.state === "activated" && res()); setTimeout(res, 60000); });
-          if (SYNC.token) await syncNow(true);
-          location.reload(); return;
         }
       }
       if (SYNC.token) await syncNow(true);
+      // Работающий код — версии LIB.version. Если на GitHub другая — перезагрузиться в новую.
+      if (REMOTE && REMOTE.version && REMOTE.version !== LIB.version) {
+        let tries = 0; try { tries = +(sessionStorage.getItem("konspekty.reload") || 0); } catch (e) { /* без хранилища */ }
+        try { sessionStorage.setItem("konspekty.reload", String(tries + 1)); } catch (e) { /* без хранилища */ }
+        if (tries >= 1) {
+          // перезагрузка не помогла (Safari держит старую версию) — сбросить кэш приложения; записи не трогаются
+          say("Ставлю новую версию начисто…");
+          for (const k of await caches.keys()) if (k !== AUDIO_CACHE) await caches.delete(k);
+          if (reg) await reg.unregister();
+        }
+        location.reload(); return;
+      }
+      try { sessionStorage.removeItem("konspekty.reload"); } catch (e) { /* без хранилища */ }
       toast("База и записи — последней версии."); route();
     } catch (e) {
       toast(e.message === "offline" ? "Нет интернета — обновиться можно при подключении." : "Не удалось обновить: " + e.message + ". Попробуй ещё раз.");
@@ -1066,12 +1077,17 @@
     if (!navigator.onLine || !/^https?:$/.test(location.protocol)) return;
     const info = await remoteInfo();
     const el = document.querySelector("[data-update-note]");
-    // текущая версия — имя кэша приложения (его создаёт service worker своей версии)
-    const cur = canCache ? (await caches.keys()).find(k => k.startsWith("konspekty-") && k !== AUDIO_CACHE) : "";
-    const outdated = info && ((cur && info.version && info.version !== cur) || (info.built && info.built !== LIB.built));
-    if (outdated && el) { el.hidden = false; el.textContent = "Вышло обновление — нажми «Обновить базу и записи»."; }
+    // версия работающего кода (вшита в library.js при сборке) против версии на GitHub
+    const outdated = !!(info && ((info.version && LIB.version && info.version !== LIB.version) || (info.built && info.built !== LIB.built)));
+    if (el) { el.hidden = !outdated; el.textContent = outdated ? "Вышло обновление — нажми кнопку ниже." : ""; }
     const st = await audioStatus(), a = document.querySelector("[data-audio-note]");
     if (a) a.textContent = st.total ? `Записи на устройстве: ${st.have} из ${st.total}` : "";
+    // кнопка горит, только когда есть что получить: новая версия или недостающие записи
+    const btn = document.querySelector('[data-act="update-base"]'), need = outdated || st.missing.length > 0;
+    if (btn && !btn.disabled) {
+      btn.classList.toggle("primary", need); btn.classList.toggle("glow", need); btn.classList.toggle("ghost", !need);
+      btn.textContent = outdated ? "Обновить — вышла новая версия" : st.missing.length ? `Скачать записи (${st.missing.length})` : "Проверить обновления";
+    }
   }
 
   /* ================= синхронизация прогресса между устройствами (закрытый GitHub Gist) ================= */
@@ -1125,7 +1141,7 @@
   }
   function offlinePanel() {
     return `<p class="setting" data-audio-note></p><p class="setting accent" data-update-note hidden></p>
-      <div class="tools"><button type="button" class="btn primary glow small" data-act="update-base">Обновить базу и записи</button></div>`;
+      <div class="tools"><button type="button" class="btn ghost small" data-act="update-base">Проверить обновления</button></div>`;
   }
   window.addEventListener("online", () => { checkForUpdate(); syncNow(true); });
 
