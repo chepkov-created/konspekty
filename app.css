@@ -258,7 +258,9 @@ button.e-person { font-size: .9em; line-height: inherit; }
 .e-missing { text-decoration: underline dotted var(--line-2); text-underline-offset: .2em; }
 .e-prov { position: relative; cursor: pointer; background: none; line-height: 1.4; }
 .e-prov::after { content: ""; position: absolute; inset: calc(-1 * var(--s3)) calc(-1 * var(--s1)); }
-span.e-prov { cursor: default; } span.e-prov::after { content: none; }
+/* «справка», «синтез» — пометка, не кнопка: без рамки, тихий курсив (нажимаемые метки лекций — в рамке с ▶) */
+span.e-prov { cursor: default; border: 0; padding: 0; margin-left: .3em; font-family: var(--font-text); font-style: italic; font-size: .78em; letter-spacing: 0; color: var(--ink-3); }
+span.e-prov::after { content: none; }
 .hl-lecture { background: oklch(72% 0.17 52 / .14); box-shadow: 0 0 0 var(--s1) oklch(72% 0.17 52 / .14); border-radius: var(--r-chip); }
 .type-badge { display: inline-flex; align-items: center; gap: var(--s1); }
 .type-badge.person, .type-badge.character { color: var(--person); } .type-badge.concept { color: var(--concept); } .type-badge.problem { color: var(--conflict); }
