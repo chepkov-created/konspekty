@@ -1066,7 +1066,10 @@
     if (!navigator.onLine || !/^https?:$/.test(location.protocol)) return;
     const info = await remoteInfo();
     const el = document.querySelector("[data-update-note]");
-    if (info && el && info.built && info.built !== LIB.built) { el.hidden = false; el.textContent = "Вышло обновление базы — нажми «Обновить базу»."; }
+    // текущая версия — имя кэша приложения (его создаёт service worker своей версии)
+    const cur = canCache ? (await caches.keys()).find(k => k.startsWith("konspekty-") && k !== AUDIO_CACHE) : "";
+    const outdated = info && ((cur && info.version && info.version !== cur) || (info.built && info.built !== LIB.built));
+    if (outdated && el) { el.hidden = false; el.textContent = "Вышло обновление — нажми «Обновить базу и записи»."; }
     const st = await audioStatus(), a = document.querySelector("[data-audio-note]");
     if (a) a.textContent = st.total ? `Записи на устройстве: ${st.have} из ${st.total}` : "";
   }
